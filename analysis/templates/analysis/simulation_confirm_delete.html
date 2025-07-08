@@ -1,0 +1,24 @@
+{% extends "analysis/base.html" %}
+
+{% block title %}Confirm Delete{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="alert alert-warning text-center">
+    <i class="bi bi-exclamation-triangle"></i>
+    <h4 class="mt-2">Are you sure you want to delete this simulation?</h4>
+    <p class="mb-0"><strong>{{ sim.label }}</strong><br>
+    Created at: {{ sim.created_at|date:"Y-m-d H:i" }}</p>
+  </div>
+
+  <form method="post" class="text-center mt-4">
+    {% csrf_token %}
+    <a href="{% url 'simulation_history' %}" class="btn btn-secondary">
+      <i class="bi bi-x-circle"></i> Cancel
+    </a>
+    <button type="submit" class="btn btn-danger">
+      <i class="bi bi-trash"></i> Yes, Delete
+    </button>
+  </form>
+</div>
+{% endblock %}

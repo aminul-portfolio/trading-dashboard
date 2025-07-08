@@ -1,0 +1,158 @@
+{% extends 'analysis/base.html' %}
+{% load dict_extras %}
+
+{% block title %}Scenario Analysis{% endblock %}
+
+{% block content %}
+<div class="py-4" style="background: #eef2f7;">
+  <div class="card gradient-card p-4 shadow-sm rounded text-white">
+
+    <!-- Header -->
+    <div class="d-flex align-items-center mb-3">
+      <i class="bi bi-bar-chart-steps fs-3 me-2"></i>
+      <h2 class="mb-0">Scenario Analysis</h2>
+    </div>
+    <p class="mb-4 text-light">
+      Compare multiple Monte Carlo scenarios side by side.
+    </p>
+
+    <!-- Upload Form -->
+    <form method="post" enctype="multipart/form-data" class="border-top border-light pt-4 mb-4">
+      {% csrf_token %}
+      <div class="row g-2 align-items-end">
+        <div class="col-md-9">
+          <label class="form-label fw-semibold text-light">Select Trading Data File</label>
+          <input type="file" name="file" class="form-control">
+          <small class="form-text text-light">Upload CSV or Excel with a <code>profit</code> column.</small>
+        </div>
+        <div class="col-md-3 d-grid">
+          <button type="submit" class="btn btn-gradient">
+            <i class="bi bi-cloud-arrow-up"></i> Upload Data
+          </button>
+        </div>
+      </div>
+    </form>
+
+    {% if instruction %}
+    <div class="alert alert-info mt-3">
+      <i class="bi bi-info-circle"></i> {{ instruction }}
+    </div>
+    {% endif %}
+
+    {% if trade_count %}
+    <div class="alert alert-info mt-3">
+      <i class="bi bi-database"></i> {{ trade_count }} trades loaded.
+    </div>
+
+    <!-- Scenario Form -->
+    <form method="post" class="border-top border-light pt-4 mt-4">
+      {% csrf_token %}
+      <input type="hidden" name="scenario_count" value="3">
+      <div class="row g-4">
+        {% for i in "123" %}
+        <div class="col-md-4">
+          <div class="border border-light rounded p-3 h-100">
+            <h6 class="text-light mb-3">Scenario {{ i }}</h6>
+
+            <label class="form-label text-light"># Simulations</label>
+            <input type="number" name="num_simulations_{{ i }}" class="form-control mb-2" placeholder="e.g., 1000"
+              value="{{ form_data|get:i|get:'num_simulations'|default:'' }}">
+
+            <label class="form-label text-light"># Trades per Simulation</label>
+            <input type="number" name="num_trades_{{ i }}" class="form-control mb-2" placeholder="e.g., 50"
+              value="{{ form_data|get:i|get:'num_trades'|default:'' }}">
+
+            <label class="form-label text-light">Range Start</label>
+            <input type="number" name="range_start_{{ i }}" class="form-control mb-2"
+              value="{{ form_data|get:i|get:'range_start'|default:'' }}">
+
+            <label class="form-label text-light">Range End</label>
+            <input type="number" name="range_end_{{ i }}" class="form-control mb-2"
+              value="{{ form_data|get:i|get:'range_end'|default:'' }}">
+
+            <label class="form-label text-light">Start Date</label>
+            <input type="date" name="start_date_{{ i }}" class="form-control mb-2"
+              value="{{ form_data|get:i|get:'start_date'|default:'' }}">
+
+            <label class="form-label text-light">End Date</label>
+            <input type="date" name="end_date_{{ i }}" class="form-control mb-2"
+              value="{{ form_data|get:i|get:'end_date'|default:'' }}">
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      <div class="row mt-4">
+        <div class="col-md-6 d-grid">
+          <button type="submit" class="btn btn-gradient">
+            <i class="bi bi-play-circle"></i> Run Scenarios
+          </button>
+        </div>
+        <div class="col-md-6 d-grid">
+          <button type="submit" name="reset" value="1" class="btn btn-secondary">
+            <i class="bi bi-x-circle"></i> Reset
+          </button>
+        </div>
+      </div>
+    </form>
+    {% endif %}
+
+    <!-- Scenario Results -->
+    {% if scenarios %}
+    <div class="border-top border-light pt-4 mt-4">
+      <h5 class="mb-3 text-light fw-semibold">
+        <i class="bi bi-bar-chart-line"></i> Scenario Results
+      </h5>
+      <div class="row g-4">
+        {% for scenario in scenarios %}
+        <div class="col-md-4">
+          <div class="border border-light rounded p-3 h-100 bg-dark text-white">
+            <h6>{{ scenario.label }}</h6>
+            {% if scenario.error %}
+            <div class="alert alert-warning mt-2">{{ scenario.error }}</div>
+            {% else %}
+            <ul class="list-unstyled mb-3">
+              <li><i class="bi bi-currency-dollar"></i> Min: ${{ scenario.min|floatformat:2 }}</li>
+              <li><i class="bi bi-currency-dollar"></i> Max: ${{ scenario.max|floatformat:2 }}</li>
+              <li><i class="bi bi-currency-dollar"></i> Median: ${{ scenario.median|floatformat:2 }}</li>
+              <li><i class="bi bi-emoji-smile"></i> Profit Chance: {{ scenario.prob_positive|floatformat:2 }}%</li>
+            </ul>
+
+            <!-- Download Button -->
+            <div class="mb-2 text-end">
+              <a download="{{ scenario.label|slugify }}_chart.png" href="data:image/png;base64,{{ scenario.chart }}" class="btn btn-sm btn-outline-light">
+                <i class="bi bi-download"></i> Download Chart
+              </a>
+            </div>
+
+            <!-- Clickable Thumbnail -->
+            <div class="text-center">
+              <img src="data:image/png;base64,{{ scenario.chart }}" class="img-fluid rounded border scenario-chart-thumb"
+                   style="cursor:pointer;" data-bs-toggle="modal" data-bs-target="#scenarioModal{{ forloop.counter }}">
+            </div>
+
+            <!-- Modal -->
+            <div class="modal fade" id="scenarioModal{{ forloop.counter }}" tabindex="-1" aria-hidden="true">
+              <div class="modal-dialog modal-dialog-centered modal-xl">
+                <div class="modal-content bg-dark">
+                  <div class="modal-header border-0">
+                    <h5 class="modal-title text-light">
+                      <i class="bi bi-bar-chart-line"></i> {{ scenario.label }} - Full Size
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                  </div>
+                  <div class="modal-body text-center">
+                    <img src="data:image/png;base64,{{ scenario.chart }}" class="img-fluid rounded border">
+                  </div>
+                </div>
+              </div>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

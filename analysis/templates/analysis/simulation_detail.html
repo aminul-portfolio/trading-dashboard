@@ -1,0 +1,61 @@
+{% extends "analysis/base.html" %}
+{% block title %}Simulation Detail{% endblock %}
+
+{% block content %}
+<div class="py-4">
+  <div class="card p-4 shadow-sm">
+    <h4 class="mb-3">
+      <i class="bi bi-bar-chart-line"></i> {{ sim.label }}
+    </h4>
+    <p>
+      <strong>Date:</strong> {{ sim.created_at|date:"Y-m-d H:i" }}
+    </p>
+
+    <hr>
+
+    <h6 class="mt-3">Parameters</h6>
+    <div class="bg-light p-2 rounded">
+      <pre class="m-0">{{ sim.parameters|json_script:"params" }}</pre>
+    </div>
+
+    <h6 class="mt-3">Results</h6>
+    <div class="bg-light p-2 rounded">
+      <pre class="m-0">{{ sim.results|json_script:"results" }}</pre>
+    </div>
+
+    <h6 class="mt-3">Chart</h6>
+    <div class="text-center mb-3">
+      <img src="data:image/png;base64,{{ sim.chart_base64 }}"
+           class="img-fluid rounded border"
+           style="cursor:pointer;"
+           data-bs-toggle="modal"
+           data-bs-target="#chartModal">
+    </div>
+
+    <div class="text-center">
+      <a download="{{ sim.label|slugify }}_chart.png"
+         href="data:image/png;base64,{{ sim.chart_base64 }}"
+         class="btn btn-outline-primary">
+        <i class="bi bi-download"></i> Download Chart
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- Modal for large image -->
+<div class="modal fade" id="chartModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-xl">
+    <div class="modal-content bg-dark">
+      <div class="modal-header border-0">
+        <h5 class="modal-title text-light">
+          <i class="bi bi-bar-chart-line"></i> Full Size Chart
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body text-center">
+        <img src="data:image/png;base64,{{ sim.chart_base64 }}" class="img-fluid rounded border">
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

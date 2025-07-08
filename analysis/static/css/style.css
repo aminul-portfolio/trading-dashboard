@@ -1,0 +1,138 @@
+/* ==============================
+   GENERAL CARD STYLES
+   ============================== */
+.card {
+  border: none;
+  border-radius: 0.75rem;
+  box-shadow: 0 0.2rem 0.6rem rgba(0, 0, 0, 0.1);
+  background-color: #ffffff;
+}
+
+/* Home page feature cards lift on hover */
+.feature-card {
+  cursor: pointer;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.feature-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+/* Upload card styling */
+.upload-card {
+  border: 2px dashed #ccc;
+  background-color: #fff;
+}
+
+/* Gradient card styling */
+.gradient-card {
+  background: linear-gradient(135deg, #1e3c72, #2a5298);
+  color: white;
+  text-align: center;
+}
+
+/* Result cards for simulations */
+.result-card {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 0.5rem;
+  color: white;
+}
+
+/* ==============================
+   BUTTONS
+   ============================== */
+button[type="submit"],
+.btn {
+  border-radius: 0.4rem;
+  font-weight: 500;
+}
+
+.btn-gradient {
+  background: linear-gradient(135deg, #ff7e5f, #feb47b);
+  border: none;
+  color: white;
+  transition: all 0.3s ease;
+}
+.btn-gradient:hover {
+  opacity: 0.9;
+  transform: scale(1.02);
+}
+
+/* ==============================
+   FORMS
+   ============================== */
+form .form-label {
+  font-weight: 500;
+  color: #333;
+}
+form .form-control {
+  border-radius: 0.5rem;
+}
+
+/* ==============================
+   IMAGES
+   ============================== */
+.card img {
+  max-height: 200px;
+  object-fit: cover;
+}
+.modal-body img {
+  max-height: 80vh;
+  object-fit: contain;
+}
+
+/* ==============================
+   NAVBAR
+   ============================== */
+/* Make navbar background dark */
+.bg-dark {
+  background: #0b1a33 !important;
+}
+
+/* Nav link styling */
+.navbar .nav-link {
+  color: #ffffff !important;
+  padding: 0.4rem 0.9rem;
+  border-radius: 2rem;
+  font-weight: 500;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+/* Hover state: lighter background and slight lift */
+.navbar .nav-link:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+  transform: translateY(-1px);
+}
+
+/* Active link: stronger background */
+.navbar .nav-link.active {
+  background-color: rgba(255, 255, 255, 0.25);
+}
+
+/* Make logout button look like links */
+.navbar .nav-link.btn {
+  color: #ffffff !important;
+}
+.navbar .nav-link.btn:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+}
+
+/* ==============================
+   DROPDOWN MENUS
+   ============================== */
+.dropdown-menu-dark {
+  background-color: #1e3c72;
+}
+.dropdown-menu-dark .dropdown-item {
+  color: #ffffff;
+}
+.dropdown-menu-dark .dropdown-item:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+}
+
+/* ==============================
+   BODY BACKGROUND
+   ============================== */
+body {
+  background-color: #f8f9fa;
+}

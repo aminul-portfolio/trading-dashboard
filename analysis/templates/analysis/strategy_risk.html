@@ -1,0 +1,60 @@
+{% extends 'analysis/base.html' %}
+{% block title %}Strategy Risk Calculator{% endblock %}
+
+{% block content %}
+<div class="py-4" style="background: #eef2f7;">
+  <div class="card gradient-card p-4 shadow-sm rounded text-white">
+    <!-- Header -->
+    <div class="d-flex align-items-center mb-3">
+      <i class="bi bi-graph-up fs-3 me-2"></i>
+      <h2 class="mb-0">Strategy-Based Risk Adjustment</h2>
+    </div>
+
+    <p class="mb-4">
+      Calculate an adjusted lot size based on your strategy's win rate, risk-reward ratio, and volatility.
+    </p>
+
+    <!-- Form -->
+    <form method="post" class="border-top border-light pt-4 row g-4">
+      {% csrf_token %}
+      {% for field in form %}
+      <div class="col-md-6">
+        <div class="form-floating">
+          {{ field }}
+          <label>{{ field.label }}</label>
+        </div>
+        {% if field.help_text %}
+        <small class="form-text text-light">{{ field.help_text }}</small>
+        {% endif %}
+        {% for error in field.errors %}
+        <div class="text-warning small mt-1">
+          <i class="bi bi-exclamation-triangle"></i> {{ error }}
+        </div>
+        {% endfor %}
+      </div>
+      {% endfor %}
+      <div class="col-12">
+        <button type="submit" class="btn btn-gradient w-100">
+          <i class="bi bi-calculator"></i> Calculate Adjustment
+        </button>
+      </div>
+    </form>
+
+    <!-- Result -->
+    {% if result %}
+    <div class="border-top border-light pt-4 mt-4">
+      <h5 class="mb-3">
+        <i class="bi bi-sliders text-warning"></i> Calculation Result
+      </h5>
+      <div class="p-3 result-card d-flex align-items-center">
+        <i class="bi bi-bar-chart-steps fs-3 me-3 text-success"></i>
+        <div>
+          <strong>Adjusted Lot Size:</strong><br>
+          <span class="fs-5">{{ result|floatformat:2 }}</span>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

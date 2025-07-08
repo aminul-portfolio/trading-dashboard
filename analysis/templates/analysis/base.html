@@ -1,0 +1,116 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>{% block title %}Trading Dashboard{% endblock %}</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body class="bg-light">
+
+  <nav class="navbar navbar-expand-lg sticky-top bg-dark">
+  <div class="container-fluid">
+    <a class="navbar-brand text-white fw-bold" href="{% url 'home' %}">
+      <i class="bi bi-bar-chart-line"></i> Trading Dashboard
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ms-auto align-items-center">
+        <!-- Home -->
+        <li class="nav-item">
+          <a class="nav-link px-3 rounded-pill {% if request.path == '/' %}active{% endif %}" href="{% url 'home' %}">
+            <i class="bi bi-house-door"></i> Home
+          </a>
+        </li>
+        <!-- Upload -->
+        <li class="nav-item">
+          <a class="nav-link px-3 rounded-pill {% if request.path == '/upload/' %}active{% endif %}" href="{% url 'upload' %}">
+            <i class="bi bi-upload"></i> Upload Data
+          </a>
+        </li>
+        <!-- Dashboard -->
+        <li class="nav-item">
+          <a class="nav-link px-3 rounded-pill {% if request.path == '/dashboard/' %}active{% endif %}" href="{% url 'dashboard' %}">
+            <i class="bi bi-speedometer2"></i> Dashboard
+          </a>
+        </li>
+        <!-- Calculators Dropdown -->
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle px-3 rounded-pill {% if '/calculators/' in request.path %}active{% endif %}" href="#" role="button" data-bs-toggle="dropdown">
+            <i class="bi bi-calculator"></i> Calculators
+          </a>
+          <ul class="dropdown-menu dropdown-menu-dark">
+            <li><a class="dropdown-item" href="{% url 'lot_size' %}"><i class="bi bi-circle"></i> Lot Size</a></li>
+            <li><a class="dropdown-item" href="{% url 'risk_per_trade' %}"><i class="bi bi-percent"></i> % Risk per Trade</a></li>
+            <li><a class="dropdown-item" href="{% url 'strategy_risk' %}"><i class="bi bi-graph-up"></i> Strategy Risk</a></li>
+            <li><a class="dropdown-item" href="{% url 'sltp' %}"><i class="bi bi-sliders"></i> SL/TP</a></li>
+          </ul>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link px-3 rounded-pill {% if request.path == '/simulations/history/' %}active{% endif %}"
+             href="{% url 'simulation_history' %}">
+            <i class="bi bi-clock-history"></i> Simulation History
+          </a>
+        </li>
+
+
+        <li class="nav-item">
+          <a class="nav-link px-3 rounded-pill {% if request.path == '/simulations/scenario/' %}active{% endif %}" href="{% url 'simulation_scenario' %}">
+            <i class="bi bi-diagram-3"></i> Scenario Analysis
+          </a>
+        </li>
+
+        <li class="nav-item">
+          <a class="nav-link px-3 rounded-pill {% if request.path == '/simulations/run/' %}active{% endif %}" href="{% url 'simulation_run' %}">
+            <i class="bi bi-shuffle"></i> Monte Simulation curve
+          </a>
+        </li>
+
+        <!-- Monte Carlo -->
+        <li class="nav-item">
+          <a class="nav-link px-3 rounded-pill {% if request.path == '/simulations/monte-carlo/' %}active{% endif %}" href="{% url 'monte_carlo' %}">
+            <i class="bi bi-shuffle"></i> Monte Carlo
+          </a>
+        </li>
+
+        <!-- Login / Logout -->
+        {% if user.is_authenticated %}
+        <li class="nav-item">
+          <form method="post" action="{% url 'logout' %}" class="m-0">
+            {% csrf_token %}
+            <button type="submit" class="nav-link btn btn-link px-3 rounded-pill" style="color: #fff; text-decoration: none;">
+              <i class="bi bi-box-arrow-right"></i> Logout
+            </button>
+          </form>
+        </li>
+        {% else %}
+        <li class="nav-item">
+          <a class="nav-link px-3 rounded-pill {% if request.path == '/login/' %}active{% endif %}" href="{% url 'login' %}">
+            <i class="bi bi-box-arrow-in-right"></i> Login
+          </a>
+        </li>
+        {% endif %}
+        <!-- Admin -->
+        <li class="nav-item">
+          <a class="nav-link px-3 rounded-pill" href="/admin/">
+            <i class="bi bi-gear"></i> Admin
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+
+  <div class="container py-4">
+    {% block content %}
+    {% endblock %}
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,115 @@
+{% extends "analysis/base.html" %}
+{% block title %}Simulation History{% endblock %}
+
+{% block content %}
+<div class="py-4">
+  <div class="card shadow-sm">
+    <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+      <h4 class="mb-0"><i class="bi bi-clock-history"></i> Simulation History</h4>
+      <form class="d-flex" method="get">
+        <input type="text" name="q" class="form-control form-control-sm me-2" placeholder="Search..."
+               value="{{ query }}">
+        <input type="date" name="date_from" class="form-control form-control-sm me-2" value="{{ date_from }}">
+        <input type="date" name="date_to" class="form-control form-control-sm me-2" value="{{ date_to }}">
+        <button class="btn btn-sm btn-outline-light" type="submit">
+          <i class="bi bi-search"></i>
+        </button>
+      </form>
+    </div>
+    <div class="card-body">
+      {% if simulations %}
+        <div class="row g-4">
+          {% for sim in simulations %}
+          <div class="col-md-6 col-lg-4">
+            <div class="border p-3 h-100 bg-light d-flex flex-column justify-content-between">
+              <div>
+                <h6 class="fw-bold mb-2">{{ sim.label }}</h6>
+                <small class="text-muted">
+                  <i class="bi bi-calendar"></i> {{ sim.created_at|date:"Y-m-d H:i" }}
+                </small>
+                <ul class="list-unstyled mt-2 mb-2">
+                  <li><i class="bi bi-repeat"></i> Simulations: {{ sim.parameters.num_simulations }}</li>
+                  <li><i class="bi bi-list-ol"></i> Trades per Simulation: {{ sim.parameters.num_trades }}</li>
+                  <li><i class="bi bi-emoji-smile"></i> Profit Chance: {{ sim.results.prob_positive|floatformat:2 }}%</li>
+                  <li><i class="bi bi-currency-dollar"></i> Median: ${{ sim.results.median|floatformat:2 }}</li>
+                </ul>
+              </div>
+              <div class="text-center">
+                <img src="data:image/png;base64,{{ sim.chart_base64 }}"
+                     class="img-fluid rounded border mb-2"
+                     style="cursor:pointer;"
+                     data-bs-toggle="modal"
+                     data-bs-target="#modal{{ sim.id }}">
+              </div>
+              <div class="d-flex justify-content-between">
+                <a href="{% url 'simulation_detail' sim.pk %}" class="btn btn-sm btn-outline-primary w-50 me-1">
+                  <i class="bi bi-eye"></i> View
+                </a>
+                <a href="{% url 'simulation_delete' sim.pk %}" class="btn btn-sm btn-outline-danger w-50 ms-1">
+                  <i class="bi bi-trash"></i> Delete
+                </a>
+              </div>
+              <div class="mt-2 text-end">
+                <a download="simulation_{{ sim.id }}.png"
+                   href="data:image/png;base64,{{ sim.chart_base64 }}"
+                   class="btn btn-sm btn-outline-dark w-100">
+                  <i class="bi bi-download"></i> Download Chart
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <!-- Modal -->
+          <div class="modal fade" id="modal{{ sim.id }}" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-xl">
+              <div class="modal-content bg-dark">
+                <div class="modal-header border-0">
+                  <h5 class="modal-title text-light">
+                    <i class="bi bi-bar-chart-line"></i> {{ sim.label }} - Full Size
+                  </h5>
+                  <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body text-center">
+                  <img src="data:image/png;base64,{{ sim.chart_base64 }}" class="img-fluid rounded border">
+                </div>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+
+        {% if page_obj.has_other_pages %}
+        <nav class="mt-4">
+          <ul class="pagination justify-content-center">
+            {% if page_obj.has_previous %}
+            <li class="page-item">
+              <a class="page-link" href="?q={{ query }}&date_from={{ date_from }}&date_to={{ date_to }}&page={{ page_obj.previous_page_number }}">
+                Previous
+              </a>
+            </li>
+            {% endif %}
+            <li class="page-item disabled">
+              <span class="page-link">
+                Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+              </span>
+            </li>
+            {% if page_obj.has_next %}
+            <li class="page-item">
+              <a class="page-link" href="?q={{ query }}&date_from={{ date_from }}&date_to={{ date_to }}&page={{ page_obj.next_page_number }}">
+                Next
+              </a>
+            </li>
+            {% endif %}
+          </ul>
+        </nav>
+        {% endif %}
+
+      {% else %}
+        <div class="alert alert-info">
+          <i class="bi bi-info-circle"></i> No simulations saved yet.
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}
